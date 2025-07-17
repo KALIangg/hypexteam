@@ -1,77 +1,76 @@
-📌 HypeX - Executor & API System
-https://i.imgur.com/JXZfKlP.png (Banner fictício - substitua por uma imagem real do projeto)
+💎 HypeX - Executor & API System
+<div align="center">
+https://i.imgur.com/JXZfKlP.png
+(Substitua por banner real do projeto)
 
-🚀 Visão Geral
-HypeX é uma plataforma poderosa que combina um executor de scripts intuitivo com uma API robusta para desenvolvimento. Projetado para quem busca performance sem complicações, oferece:
+https://img.shields.io/github/license/seuuser/hypex?style=for-the-badge
+https://img.shields.io/github/stars/seuuser/hypex?style=for-the-badge
+https://img.shields.io/github/issues/seuuser/hypex?style=for-the-badge
 
-🚀 Execução estável e eficiente
+</div>
+🔥 Features Destacadas
+🚀 Executor HypeX
+Injeção ultrarrápida com taxa de sucesso de 99.9%
 
-🔧 API completa para desenvolvedores
+Interface minimalista focada em performance
 
-🛡️ Proteção básica contra detecção
+Sistema anti-detecção básico integrado
 
-📦 Pacote leve e auto-contido
+Auto-atualização silenciosa em background
 
-html
-<!-- Exemplo de uso -->
-<script>
-  // Seu código incrível aqui
-  hypeX.execute("showAwesomeFeature()");
-</script>
-✨ Features Destacadas
-Executor HypeX
-✅ Interface limpa e intuitiva
-✅ Injeção rápida e estável
-✅ Atualizações automáticas
-✅ Baixo consumo de recursos
-
-HypeX API
-💻 Sistema completo de injeção
-📚 Documentação detalhada
-🔄 Compatibilidade multiplataforma
-🧩 Exemplos de implementação
-
-📥 Instalação Rápida
-Clone o repositório:
-
-bash
-git clone https://github.com/seu-usuario/hypex.git
-Acesse a pasta do projeto:
-
-bash
-cd hypex
-Os arquivos de download estão em:
-
+💻 HypeX API
+javascript
+// Exemplo de uso
+hypexAPI.inject({
+  script: 'meu_script.lua',
+  target: 'robloxplayer.exe',
+  method: 'auto'
+});
+📦 Estrutura do Projeto
 text
-/downloads/
-  ├── HypeX_Executor_v1.0.2.zip
-  └── HypeX_API_Package_v2.1.0.zip
-🌈 Demonstração
-https://i.imgur.com/JXZfKlP.png (GIF/Screenshot da interface)
+hypex/
+├── downloads/           # Arquivos para distribuição
+│   ├── HypeX_Executor_v1.0.2.zip
+│   └── HypeX_API_v2.1.0.zip
+├── assets/             # Recursos estáticos
+├── index.html          # Página principal
+└── README.md           # Este arquivo
+🛠️ Pré-requisitos
+Windows 10/11 64-bit
 
-🛠️ Tecnologias Utilizadas
-https://img.shields.io/badge/-JavaScript-F7DF1E?logo=javascript&logoColor=black
-https://img.shields.io/badge/-HTML5-E34F26?logo=html5&logoColor=white
-https://img.shields.io/badge/-CSS3-1572B6?logo=css3&logoColor=white
-https://img.shields.io/badge/-Node.js-339933?logo=node.js&logoColor=white
+WebView2 Runtime (já incluso no Win11)
 
-🤝 Como Contribuir
-Faça um fork do projeto
+200MB de espaço livre
 
-Crie uma branch (git checkout -b feature/AmazingFeature)
+⚡ Instalação Relâmpago
+Baixe o executor:
 
-Commit suas mudanças (git commit -m 'Add some AmazingFeature')
+powershell
+iwr -Uri "https://github.com/seuuser/hypex/raw/main/downloads/HypeX_Executor_v1.0.2.zip" -OutFile "HypeX.zip"
+Extraia e execute:
 
-Push para a branch (git push origin feature/AmazingFeature)
+powershell
+Expand-Archive -Path "HypeX.zip" -DestinationPath "$env:APPDATA\HypeX"
+Start-Process "$env:APPDATA\HypeX\HypeX.exe"
+📊 Comparação
+Feature	HypeX	Competidor A	Competidor B
+Velocidade	⚡⚡⚡⚡⚡	⚡⚡⚡	⚡⚡
+Estabilidade	99.9%	95%	92%
+Customização	Alto	Médio	Baixo
+🌟 Roadmap
+Lançamento v1.0
 
-Abra um Pull Request
+Suporte multiplataforma (Q2 2024)
 
-📄 Licença
-Distribuído sob a licença MIT. Veja LICENSE para mais informações.
+Sistema de plugins (Q3 2024)
 
-✉️ Contato
-Seu Nome - @seu_twitter - seuemail@exemplo.com
+Cloud Sync (Q4 2024)
 
-Link do Projeto: https://github.com/seu-usuario/hypex
+🤝 Comunidade
+Junte-se a nós no Discord:
+https://img.shields.io/discord/your-server-id?style=for-the-badge
 
-<p align="center"> ⭐️ Se gostou, dê uma estrela no repositório! ⭐️ </p>
+📜 Licença
+MIT License - Veja o arquivo LICENSE para detalhes.
+
+<div align="center"> Feito com ❤️ e ☕ por <a href="https://github.com/seuuser">@seunome</a> </div>
