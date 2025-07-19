@@ -142,12 +142,56 @@
             box-shadow: 0 8px 20px rgba(255, 53, 93, 0.6);
         }
         
+        .premium-btn {
+            display: inline-block;
+            background: linear-gradient(45deg, #ffcc00, #ff9900);
+            color: #000;
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 204, 0, 0.4);
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .premium-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 204, 0, 0.6);
+        }
+        
         .download-size {
             display: block;
             margin-top: 1rem;
             color: #aaa;
             font-size: 0.9rem;
             text-align: center;
+        }
+        
+        .category-title {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 3rem;
+            color: #ff355d;
+            text-shadow: 0 0 10px #ff355d, 0 0 20px rgba(255, 53, 93, 0.5);
+            text-align: center;
+            margin: 2rem 0;
+            width: 100%;
+        }
+        
+        .category-description {
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+            color: #ccc;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
         }
         
         .about-section {
@@ -298,6 +342,10 @@
             </p>
         </header>
         
+        <!-- Categoria Free -->
+        <h2 class="category-title">FREE</h2>
+        <p class="category-description">Downloads gratuitos com recursos básicos para começar a usar o HypeX</p>
+        
         <div class="download-section">
             <div class="download-card">
                 <h2 class="download-title">Executor</h2>
@@ -325,6 +373,30 @@
                 </ul>
                 <button class="download-btn" onclick="downloadFile('CloudyApi.dll')">Download API</button>
                 <span class="download-size">Tamanho: ? • Versão 2.1.0</span>
+            </div>
+        </div>
+        
+        <!-- Categoria Premium -->
+        <h2 class="category-title">PREMIUM</h2>
+        <p class="category-description">Recursos avançados e exclusivos para usuários Premium</p>
+        
+        <div class="download-section">
+            <div class="download-card">
+                <h2 class="download-title">HypeX Dashboard</h2>
+                <ul class="download-features">
+                    <li>Controle remoto completo via web</li>
+                    <li>Monitoramento em tempo real</li>
+                    <li>Sistema avançado de teleport</li>
+                    <li>Configurações personalizáveis</li>
+                    <li>Atualizações prioritárias</li>
+                    <li>Proteção avançada contra detecção</li>
+                </ul>
+                <button class="download-btn" onclick="downloadFile('HypeX_Dashboard.zip')">Download Dashboard</button>
+                <span class="download-size">Tamanho: ? • Versão 1.5.0</span>
+                <button class="premium-btn" onclick="showPremiumModal()">ADQUIRIR PREMIUM</button>
+                <p style="text-align: center; margin-top: 1rem; color: #ffcc00; font-size: 0.9rem;">
+                    Desbloqueie todos os recursos premium por apenas R$29,90/mês
+                </p>
             </div>
         </div>
         
@@ -477,9 +549,31 @@
         }
         
         // Função de download
-        function downloadFile(filename) {
-            // Em um cenário real, isso seria substituído pelo link real do arquivo
-            alert(`Iniciando download de ${filename}\n\nNa implementação real, este seria o link para o arquivo.`);
+    	function downloadFile(filename) {
+            // Cria um link temporário
+            const link = document.createElement('a');
+            link.href = filename;  // Assume que o arquivo está no mesmo diretório
+            link.download = filename;
+        
+        	// Adiciona ao documento
+            document.body.appendChild(link);
+        
+        // Dispara o clique
+            link.click();
+        
+        // Remove o link
+            document.body.removeChild(link);
+        
+        // Opcional: tratamento de erro
+            link.onerror = function() {
+               alert(`Erro: O arquivo ${filename} não foi encontrado no servidor.`);
+               console.error(`Arquivo não encontrado: ${filename}`);
+            };
+         }
+        
+        // Função para mostrar modal de premium
+        function showPremiumModal() {
+            alert("Redirecionando para a página de aquisição do Premium...\n\nNa implementação real, isso abriria um modal ou redirecionaria para uma página de pagamento.");
         }
     </script>
 </body>
