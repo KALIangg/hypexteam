@@ -16,8 +16,8 @@
         
         body {
             font-family: 'Oxanium', sans-serif;
-            background-color: #0a0a0a;
-            color: #fff;
+            background-color: #000000;
+            color: #ffffff;
             overflow-x: hidden;
             line-height: 1.6;
         }
@@ -29,7 +29,7 @@
             width: 100%;
             height: 100%;
             z-index: -1;
-            background: radial-gradient(ellipse at bottom, #1a1a1a 0%, #000000 100%);
+            background: linear-gradient(to bottom, #000000 0%, #222222 100%);
         }
         
         .container {
@@ -48,8 +48,8 @@
             font-family: 'Rajdhani', sans-serif;
             font-size: 5.5rem;
             margin-bottom: 1.5rem;
-            color: #ff355d;
-            text-shadow: 0 0 8px #ff355d, 0 0 16px rgba(255, 53, 93, 0.5);
+            color: #ffffff;
+            text-shadow: 0 0 8px #ffffff, 0 0 16px rgba(255, 255, 255, 0.5);
             letter-spacing: 3px;
             font-weight: 700;
             position: relative;
@@ -64,7 +64,7 @@
             transform: translateX(-50%);
             width: 60%;
             height: 3px;
-            background: linear-gradient(90deg, transparent, #ff355d, transparent);
+            background: linear-gradient(90deg, transparent, #ffffff, transparent);
             border-radius: 50%;
             filter: blur(1px);
         }
@@ -78,14 +78,14 @@
         }
         
         .download-card {
-            background: rgba(30, 30, 30, 0.7);
+            background: rgba(50, 50, 50, 0.7);
             border-radius: 15px;
             padding: 2.5rem;
             width: 100%;
             max-width: 500px;
-            border: 1px solid rgba(255, 53, 93, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(10px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             transition: transform 0.3s ease;
         }
         
@@ -96,31 +96,34 @@
         .download-title {
             font-family: 'Rajdhani', sans-serif;
             font-size: 2rem;
-            color: #ff355d;
+            color: #ffffff;
             margin-bottom: 1.5rem;
             text-align: center;
         }
         
         .download-features {
             margin: 2rem 0;
+            list-style-type: none;
         }
         
         .download-features li {
             margin-bottom: 0.8rem;
             position: relative;
             padding-left: 1.5rem;
+            color: #dddddd;
         }
         
         .download-features li::before {
-            content: '→';
-            color: #ff355d;
+            content: '•';
+            color: #ffffff;
             position: absolute;
             left: 0;
+            font-weight: bold;
         }
         
         .download-btn {
             display: inline-block;
-            background: linear-gradient(45deg, #ff355d, #ff6b8b);
+            background: linear-gradient(45deg, #333333, #555555);
             color: white;
             padding: 1rem 2.5rem;
             border-radius: 50px;
@@ -130,8 +133,8 @@
             font-weight: 600;
             margin-top: 1rem;
             transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(255, 53, 93, 0.4);
-            border: none;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             cursor: pointer;
             width: 100%;
             text-align: center;
@@ -139,13 +142,14 @@
         
         .download-btn:hover {
             transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(255, 53, 93, 0.6);
+            box-shadow: 0 8px 20px rgba(255, 255, 255, 0.2);
+            background: linear-gradient(45deg, #444444, #666666);
         }
         
         .premium-btn {
             display: inline-block;
-            background: linear-gradient(45deg, #ffcc00, #ff9900);
-            color: #000;
+            background: linear-gradient(45deg, #888888, #aaaaaa);
+            color: #000000;
             padding: 1rem 2.5rem;
             border-radius: 50px;
             text-decoration: none;
@@ -154,8 +158,8 @@
             font-weight: 700;
             margin-top: 1rem;
             transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(255, 204, 0, 0.4);
-            border: none;
+            box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             cursor: pointer;
             width: 100%;
             text-align: center;
@@ -163,13 +167,14 @@
         
         .premium-btn:hover {
             transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(255, 204, 0, 0.6);
+            box-shadow: 0 8px 20px rgba(255, 255, 255, 0.3);
+            background: linear-gradient(45deg, #999999, #bbbbbb);
         }
         
         .download-size {
             display: block;
             margin-top: 1rem;
-            color: #aaa;
+            color: #aaaaaa;
             font-size: 0.9rem;
             text-align: center;
         }
@@ -177,8 +182,8 @@
         .category-title {
             font-family: 'Rajdhani', sans-serif;
             font-size: 3rem;
-            color: #ff355d;
-            text-shadow: 0 0 10px #ff355d, 0 0 20px rgba(255, 53, 93, 0.5);
+            color: #ffffff;
+            text-shadow: 0 0 10px #ffffff, 0 0 20px rgba(255, 255, 255, 0.5);
             text-align: center;
             margin: 2rem 0;
             width: 100%;
@@ -188,24 +193,24 @@
             text-align: center;
             margin-bottom: 2rem;
             font-size: 1.1rem;
-            color: #ccc;
+            color: #cccccc;
             max-width: 800px;
             margin-left: auto;
             margin-right: auto;
         }
         
         .about-section {
-            background: rgba(20, 0, 0, 0.5);
+            background: rgba(30, 30, 30, 0.7);
             border-radius: 15px;
             padding: 3rem;
             margin-top: 3rem;
-            border: 1px solid rgba(255, 53, 93, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
         
         .about-title {
             font-family: 'Rajdhani', sans-serif;
             font-size: 2.5rem;
-            color: #ff355d;
+            color: #ffffff;
             margin-bottom: 1.5rem;
             text-align: center;
         }
@@ -220,21 +225,23 @@
         
         .about-tab {
             padding: 0.8rem 1.5rem;
-            background: rgba(255, 53, 93, 0.1);
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 50px;
             cursor: pointer;
             transition: all 0.3s ease;
-            border: 1px solid rgba(255, 53, 93, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #ffffff;
         }
         
         .about-tab:hover, .about-tab.active {
-            background: rgba(255, 53, 93, 0.3);
-            box-shadow: 0 0 15px rgba(255, 53, 93, 0.3);
+            background: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
         }
         
         .about-content {
             display: none;
             animation: fadeIn 0.5s ease;
+            color: #dddddd;
         }
         
         .about-content.active {
@@ -244,26 +251,26 @@
         .history-item {
             margin-bottom: 2rem;
             padding-bottom: 1rem;
-            border-bottom: 1px solid rgba(255, 53, 93, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
         }
         
         .history-date {
-            color: #ff355d;
+            color: #ffffff;
             font-weight: bold;
             margin-bottom: 0.5rem;
         }
         
         .plan-item {
-            background: rgba(255, 53, 93, 0.05);
+            background: rgba(255, 255, 255, 0.05);
             padding: 1.5rem;
             border-radius: 10px;
             margin-bottom: 1.5rem;
-            border-left: 3px solid #ff355d;
+            border-left: 3px solid #ffffff;
         }
         
         .plan-title {
             font-family: 'Rajdhani', sans-serif;
-            color: #ff355d;
+            color: #ffffff;
             margin-bottom: 0.5rem;
             display: flex;
             align-items: center;
@@ -278,28 +285,28 @@
         }
         
         .status-planned {
-            background: rgba(255, 153, 51, 0.2);
-            color: #ff9933;
+            background: rgba(170, 170, 170, 0.2);
+            color: #aaaaaa;
         }
         
         .status-progress {
-            background: rgba(51, 153, 255, 0.2);
-            color: #3399ff;
+            background: rgba(170, 170, 170, 0.2);
+            color: #cccccc;
         }
         
         .status-completed {
-            background: rgba(51, 255, 153, 0.2);
-            color: #33ff99;
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
         }
         
         .log-entry {
             margin-bottom: 1rem;
             padding-bottom: 1rem;
-            border-bottom: 1px solid rgba(255, 53, 93, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .log-date {
-            color: #ff6b8b;
+            color: #bbbbbb;
             font-size: 0.9rem;
             margin-bottom: 0.3rem;
         }
