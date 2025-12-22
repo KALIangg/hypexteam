@@ -1,291 +1,360 @@
--- BladeMenu Library v2.0
--- Uma library moderna para interfaces Roblox com a aparência do BladeMenu
+-- BladeMenu Library v3.0
+-- Library completa para interfaces Roblox com design BladeMenu
 
 local BladeMenu = {}
-BladeMenu.__index = BladeMenu
-
--- Configurações padrão
-BladeMenu.Colors = {
-    Background = Color3.fromRGB(27, 27, 27),
-    Header = Color3.fromRGB(36, 36, 36),
-    Sidebar = Color3.fromRGB(40, 40, 40),
-    Content = Color3.fromRGB(48, 48, 48),
-    Button = Color3.fromRGB(60, 60, 60),
-    ButtonHover = Color3.fromRGB(80, 80, 80),
-    Text = Color3.fromRGB(255, 255, 255),
-    Accent = Color3.fromRGB(0, 170, 255),
-    ToggleOn = Color3.fromRGB(50, 255, 50),
-    ToggleOff = Color3.fromRGB(255, 50, 50)
-}
-
-BladeMenu.Version = "2.1.250"
+BladeMenu.Version = "3.0.0"
 BladeMenu.Author = "Blade Community"
 
--- Services
+-- Configurações padrão
+BladeMenu.DefaultConfig = {
+    Title = "__/BLADEMENU\\__",
+    Size = {Width = 520, Height = 340},
+    Position = {X = 0.33862, Y = 0.2896},
+    Keybind = Enum.KeyCode.RightControl,
+    Colors = {
+        Background = Color3.fromRGB(27, 27, 27),
+        Header = Color3.fromRGB(36, 36, 36),
+        Sidebar = Color3.fromRGB(40, 40, 40),
+        Content = Color3.fromRGB(48, 48, 48),
+        Button = Color3.fromRGB(60, 60, 60),
+        ButtonHover = Color3.fromRGB(80, 80, 80),
+        Text = Color3.fromRGB(255, 255, 255),
+        Accent = Color3.fromRGB(0, 170, 255),
+        ToggleOn = Color3.fromRGB(50, 255, 50),
+        ToggleOff = Color3.fromRGB(255, 50, 50)
+    }
+}
+
+-- Serviços
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
 
--- Função de inicialização (sem setmetatable, usando abordagem explícita)
-function BladeMenu.Init(config)
-    local self = {}
+-- Função auxiliar para criar instâncias
+local function Create(className, props)
+    local instance = Instance.new(className)
+    for prop, value in pairs(props) do
+        if prop == "Parent" then
+            instance.Parent = value
+        else
+            instance[prop] = value
+        end
+    end
+    return instance
+end
+
+-- Função para criar um UICorner
+local function CreateCorner(parent, radius)
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, radius or 4)
+    corner.Parent = parent
+    return corner
+end
+
+-- Função para criar UIStroke
+local function CreateStroke(parent, color, thickness)
+    local stroke = Instance.new("UIStroke")
+    stroke.Color = color
+    stroke.Thickness = thickness or 1
+    stroke.Parent = parent
+    return stroke
+end
+
+-- Função de notificação
+local function ShowNotification(text, duration)
+    duration = duration or 3
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "Blade MENU",
+        Text = text,
+        Duration = duration
+    })
+    print("[Blade MENU] " .. text)
+end
+
+-- Função para criar a UI base
+local function CreateBaseUI(menu)
+    -- ScreenGui principal
+    menu.GUI = Create("ScreenGui", {
+        Name = "BladeMenu",
+        ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
+        Parent = LocalPlayer:WaitForChild("PlayerGui"),
+        ResetOnSpawn = false
+    })
     
-    -- Configurações
-    self.Settings = {
-        Title = config and config.Title or "__/BLADEMENU\\__",
-        Size = config and config.Size or {Width = 520, Height = 340},
-        Position = config and config.Position or {X = 0.33862, Y = 0.2896},
-        Colors = config and config.Colors or BladeMenu.Colors,
-        Keybind = config and config.Keybind or Enum.KeyCode.RightControl
-    }
+    -- Frame principal
+    menu.MainFrame = Create("Frame", {
+        Name = "main",
+        Size = UDim2.new(0, menu.Config.Size.Width, 0, menu.Config.Size.Height),
+        Position = UDim2.new(menu.Config.Position.X, 0, menu.Config.Position.Y, 0),
+        BackgroundColor3 = menu.Config.Colors.Background,
+        BorderSizePixel = 0,
+        Active = true,
+        Draggable = true,
+        Parent = menu.GUI
+    })
     
-    -- Elementos da UI
-    self.GUI = nil
-    self.MainFrame = nil
-    self.Header = nil
-    self.TabHolder = nil
-    self.ContentPage = nil
+    CreateCorner(menu.MainFrame, 8)
+    CreateStroke(menu.MainFrame, Color3.fromRGB(60, 60, 60), 2)
     
-    -- Tabs
-    self.Tabs = {}
-    self.CurrentTab = nil
+    -- Header
+    menu.Header = Create("Frame", {
+        Name = "header",
+        Size = UDim2.new(1, 0, 0, 33),
+        BackgroundColor3 = menu.Config.Colors.Header,
+        BorderSizePixel = 0,
+        Parent = menu.MainFrame
+    })
     
-    -- Inicializar a interface
-    self:CreateUI()
+    CreateCorner(menu.Header, 8)
     
-    -- Configurar keybind
-    if self.Settings.Keybind then
-        UserInputService.InputBegan:Connect(function(input)
-            if input.KeyCode == self.Settings.Keybind then
-                self:Toggle()
+    -- Título
+    menu.TitleLabel = Create("TextLabel", {
+        Text = menu.Config.Title,
+        Size = UDim2.new(0, 200, 1, 0),
+        Position = UDim2.new(0.06923, 0, 0, 0),
+        BackgroundTransparency = 1,
+        TextColor3 = menu.Config.Colors.Text,
+        Font = Enum.Font.SourceSansBold,
+        TextSize = 20,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        Parent = menu.Header
+    })
+    
+    -- Botão Minimizar
+    menu.MinButton = Create("ImageButton", {
+        Name = "min",
+        Size = UDim2.new(0, 24, 0, 28),
+        Position = UDim2.new(0.88077, 0, 0.15152, 0),
+        BackgroundTransparency = 1,
+        Image = "rbxassetid://116825826868178",
+        ImageColor3 = menu.Config.Colors.Text,
+        Parent = menu.Header
+    })
+    
+    -- Botão Fechar
+    menu.CloseButton = Create("ImageButton", {
+        Name = "close",
+        Size = UDim2.new(0, 24, 0, 28),
+        Position = UDim2.new(0.93846, 0, 0.15152, 0),
+        BackgroundTransparency = 1,
+        Image = "rbxassetid://86827862123860",
+        ImageColor3 = menu.Config.Colors.Text,
+        Parent = menu.Header
+    })
+    
+    -- Tab Holder (sidebar)
+    menu.TabHolder = Create("Frame", {
+        Name = "tabholder",
+        Size = UDim2.new(0, 90, 0, 292),
+        Position = UDim2.new(0.01346, 0, 0.11765, 0),
+        BackgroundColor3 = menu.Config.Colors.Sidebar,
+        BorderSizePixel = 0,
+        Parent = menu.MainFrame
+    })
+    
+    CreateCorner(menu.TabHolder, 6)
+    CreateStroke(menu.TabHolder, Color3.fromRGB(60, 60, 60), 1)
+    
+    -- Content Page
+    menu.ContentPage = Create("Frame", {
+        Name = "contentpage",
+        Size = UDim2.new(0, 406, 0, 292),
+        Position = UDim2.new(0.20385, 0, 0.11765, 0),
+        BackgroundColor3 = menu.Config.Colors.Content,
+        BorderSizePixel = 0,
+        Parent = menu.MainFrame
+    })
+    
+    CreateCorner(menu.ContentPage, 6)
+    CreateStroke(menu.ContentPage, Color3.fromRGB(60, 60, 60), 1)
+    
+    -- Content ScrollingFrame
+    menu.ContentScroller = Create("ScrollingFrame", {
+        Size = UDim2.new(1, -10, 1, -10),
+        Position = UDim2.new(0, 5, 0, 5),
+        BackgroundTransparency = 1,
+        ScrollBarThickness = 6,
+        ScrollBarImageColor3 = menu.Config.Colors.Accent,
+        BorderSizePixel = 0,
+        Parent = menu.ContentPage
+    })
+    
+    menu.ContentLayout = Create("UIListLayout", {
+        Padding = UDim.new(0, 10),
+        HorizontalAlignment = Enum.HorizontalAlignment.Center,
+        Parent = menu.ContentScroller
+    })
+    
+    menu.ContentLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        menu.ContentScroller.CanvasSize = UDim2.new(0, 0, 0, menu.ContentLayout.AbsoluteContentSize.Y + 20)
+    end)
+end
+
+-- Função para configurar eventos da UI
+local function SetupEvents(menu)
+    -- Botão Fechar
+    menu.CloseButton.MouseButton1Click:Connect(function()
+        menu.GUI.Enabled = false
+    end)
+    
+    -- Botão Minimizar
+    local isMinimized = false
+    menu.MinButton.MouseButton1Click:Connect(function()
+        if isMinimized then
+            -- Restaurar
+            menu.MainFrame.Size = UDim2.new(0, menu.Config.Size.Width, 0, menu.Config.Size.Height)
+            menu.TabHolder.Visible = true
+            menu.ContentPage.Visible = true
+            isMinimized = false
+        else
+            -- Minimizar
+            menu.MainFrame.Size = UDim2.new(0, menu.Config.Size.Width, 0, 33)
+            menu.TabHolder.Visible = false
+            menu.ContentPage.Visible = false
+            isMinimized = true
+        end
+    end)
+    
+    -- Keybind para abrir/fechar
+    if menu.Config.Keybind then
+        UserInputService.InputBegan:Connect(function(input, gameProcessed)
+            if not gameProcessed and input.KeyCode == menu.Config.Keybind then
+                menu.GUI.Enabled = not menu.GUI.Enabled
+                ShowNotification("Menu " .. (menu.GUI.Enabled and "aberto" or "fechado"), 2)
             end
         end)
     end
     
-    -- Notificação inicial
-    self:Notify("Blade MENU v" .. BladeMenu.Version .. " carregado!", 5)
-    
-    return self
-end
-
--- Função para criar a UI base
-function BladeMenu:CreateUI()
-    -- ScreenGui
-    self.GUI = Instance.new("ScreenGui")
-    self.GUI.Name = "BladeMenu"
-    self.GUI.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-    self.GUI.Parent = LocalPlayer:WaitForChild("PlayerGui")
-    
-    -- Main Frame
-    self.MainFrame = Instance.new("Frame")
-    self.MainFrame.Name = "main"
-    self.MainFrame.Size = UDim2.new(0, self.Settings.Size.Width, 0, self.Settings.Size.Height)
-    self.MainFrame.Position = UDim2.new(self.Settings.Position.X, 0, self.Settings.Position.Y, 0)
-    self.MainFrame.BackgroundColor3 = self.Settings.Colors.Background
-    self.MainFrame.BorderSizePixel = 0
-    self.MainFrame.Active = true
-    self.MainFrame.Draggable = true
-    self.MainFrame.Parent = self.GUI
-    
-    -- Header
-    self.Header = Instance.new("Frame")
-    self.Header.Name = "header"
-    self.Header.Size = UDim2.new(1, 0, 0, 33)
-    self.Header.BackgroundColor3 = self.Settings.Colors.Header
-    self.Header.BorderSizePixel = 0
-    self.Header.Parent = self.MainFrame
-    
-    local title = Instance.new("TextLabel")
-    title.Text = self.Settings.Title
-    title.Size = UDim2.new(0, 200, 1, 0)
-    title.Position = UDim2.new(0.06923, 0, 0, 0)
-    title.BackgroundTransparency = 1
-    title.TextColor3 = self.Settings.Colors.Text
-    title.Font = Enum.Font.SourceSans
-    title.TextSize = 24
-    title.Parent = self.Header
-    
-    local closeBtn = Instance.new("ImageButton")
-    closeBtn.Name = "close"
-    closeBtn.Size = UDim2.new(0, 24, 0, 28)
-    closeBtn.Position = UDim2.new(0.93846, 0, 0.15152, 0)
-    closeBtn.BackgroundTransparency = 1
-    closeBtn.Image = "rbxassetid://86827862123860"
-    closeBtn.Parent = self.Header
-    
-    local minBtn = Instance.new("ImageButton")
-    minBtn.Name = "min"
-    minBtn.Size = UDim2.new(0, 24, 0, 28)
-    minBtn.Position = UDim2.new(0.88077, 0, 0.15152, 0)
-    minBtn.BackgroundTransparency = 1
-    minBtn.Image = "rbxassetid://116825826868178"
-    minBtn.Parent = self.Header
-    
-    -- Tab Holder (sidebar)
-    self.TabHolder = Instance.new("Frame")
-    self.TabHolder.Name = "tabholder"
-    self.TabHolder.Size = UDim2.new(0, 90, 0, 292)
-    self.TabHolder.Position = UDim2.new(0.01346, 0, 0.11765, 0)
-    self.TabHolder.BackgroundColor3 = self.Settings.Colors.Sidebar
-    self.TabHolder.BorderSizePixel = 0
-    self.TabHolder.Parent = self.MainFrame
-    
-    -- Content Page
-    self.ContentPage = Instance.new("Frame")
-    self.ContentPage.Name = "contentpage"
-    self.ContentPage.Size = UDim2.new(0, 406, 0, 292)
-    self.ContentPage.Position = UDim2.new(0.20385, 0, 0.11765, 0)
-    self.ContentPage.BackgroundColor3 = self.Settings.Colors.Content
-    self.ContentPage.BorderSizePixel = 0
-    self.ContentPage.ClipsDescendants = true
-    self.ContentPage.Parent = self.MainFrame
-    
-    -- Configurar eventos dos botões do header
-    closeBtn.MouseButton1Click:Connect(function()
-        self.GUI.Enabled = false
-    end)
-    
-    minBtn.MouseButton1Click:Connect(function()
-        if self.MainFrame.Size.Y.Offset == 33 then
-            self.MainFrame.Size = UDim2.new(0, self.Settings.Size.Width, 0, self.Settings.Size.Height)
-        else
-            self.MainFrame.Size = UDim2.new(0, self.Settings.Size.Width, 0, 33)
+    -- Fechar com ESC
+    UserInputService.InputBegan:Connect(function(input, gameProcessed)
+        if not gameProcessed and input.KeyCode == Enum.KeyCode.Escape and menu.GUI.Enabled then
+            menu.GUI.Enabled = false
         end
     end)
 end
 
 -- Função para criar uma nova aba
-function BladeMenu:CreateTab(name, icon)
-    local tabButton = Instance.new("TextButton")
-    tabButton.Name = name
-    tabButton.Size = UDim2.new(0, 77, 0, 21)
-    tabButton.Position = UDim2.new(0.06667, 0, 0, (#self.TabHolder:GetChildren() - 1) * 25 + 10)
-    tabButton.BackgroundColor3 = self.Settings.Colors.Button
-    tabButton.TextColor3 = Color3.fromRGB(0, 0, 0)
-    tabButton.Text = name
-    tabButton.Font = Enum.Font.SourceSans
-    tabButton.TextSize = 14
-    tabButton.Parent = self.TabHolder
+local function CreateTab(menu, name, icon)
+    -- Criar botão na sidebar
+    local tabButton = Create("TextButton", {
+        Name = name:lower(),
+        Size = UDim2.new(0, 77, 0, 21),
+        Position = UDim2.new(0.06667, 0, 0, (#menu.TabHolder:GetChildren() - 1) * 30 + 10),
+        BackgroundColor3 = menu.Config.Colors.Button,
+        TextColor3 = Color3.fromRGB(0, 0, 0),
+        Text = name,
+        Font = Enum.Font.SourceSansBold,
+        TextSize = 14,
+        Parent = menu.TabHolder
+    })
     
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 4)
-    corner.Parent = tabButton
-    
-    -- Criar frame de conteúdo para a aba
-    local tabContent = Instance.new("ScrollingFrame")
-    tabContent.Name = name
-    tabContent.Size = UDim2.new(1, 0, 1, 0)
-    tabContent.BackgroundTransparency = 1
-    tabContent.Visible = false
-    tabContent.ScrollBarThickness = 6
-    tabContent.AutomaticCanvasSize = Enum.AutomaticSize.Y
-    tabContent.Parent = self.ContentPage
-    
-    local layout = Instance.new("UIListLayout")
-    layout.Padding = UDim.new(0, 5)
-    layout.Parent = tabContent
-    
-    local padding = Instance.new("UIPadding")
-    padding.PaddingTop = UDim.new(0, 10)
-    padding.PaddingLeft = UDim.new(0, 10)
-    padding.Parent = tabContent
+    CreateCorner(tabButton, 4)
     
     -- Efeito hover
     tabButton.MouseEnter:Connect(function()
-        tabButton.BackgroundColor3 = self.Settings.Colors.ButtonHover
+        tabButton.BackgroundColor3 = menu.Config.Colors.ButtonHover
     end)
     
     tabButton.MouseLeave:Connect(function()
-        tabButton.BackgroundColor3 = self.Settings.Colors.Button
+        tabButton.BackgroundColor3 = menu.Config.Colors.Button
     end)
     
-    -- Sistema de navegação entre abas
-    local function showTab()
-        for _, child in pairs(self.ContentPage:GetChildren()) do
-            if child:IsA("ScrollingFrame") then
+    -- Criar frame de conteúdo
+    local tabContent = Create("ScrollingFrame", {
+        Name = name:lower(),
+        Size = UDim2.new(1, 0, 1, 0),
+        BackgroundTransparency = 1,
+        Visible = false,
+        ScrollBarThickness = 6,
+        ScrollBarImageColor3 = menu.Config.Colors.Accent,
+        BorderSizePixel = 0,
+        Parent = menu.ContentScroller
+    })
+    
+    local layout = Create("UIListLayout", {
+        Padding = UDim.new(0, 10),
+        HorizontalAlignment = Enum.HorizontalAlignment.Center,
+        Parent = tabContent
+    })
+    
+    layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        tabContent.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y + 20)
+    end)
+    
+    -- Mostrar essa aba ao clicar
+    tabButton.MouseButton1Click:Connect(function()
+        for _, child in pairs(menu.ContentScroller:GetChildren()) do
+            if child:IsA("ScrollingFrame") and child.Name ~= "UIPadding" then
                 child.Visible = false
             end
         end
         tabContent.Visible = true
-        self.CurrentTab = name
-    end
+        menu.ActiveTab = name:lower()
+    end)
     
-    tabButton.MouseButton1Click:Connect(showTab)
-    
-    -- Adicionar à lista de tabs
-    self.Tabs[name] = {
-        Button = tabButton,
-        Content = tabContent,
-        Elements = {}
-    }
-    
-    -- Retornar métodos para adicionar elementos
+    -- Métodos da tab
     local tabMethods = {}
     
     function tabMethods:AddButton(text, callback)
-        local button = Instance.new("TextButton")
-        button.Size = UDim2.new(0, 150, 0, 30)
-        button.BackgroundColor3 = self.Settings.Colors.Button
-        button.TextColor3 = self.Settings.Colors.Text
-        button.Text = text
-        button.Font = Enum.Font.SourceSansBold
-        button.TextSize = 14
-        button.Parent = tabContent
+        local button = Create("TextButton", {
+            Size = UDim2.new(0, 150, 0, 30),
+            BackgroundColor3 = menu.Config.Colors.Button,
+            TextColor3 = menu.Config.Colors.Text,
+            Text = text,
+            Font = Enum.Font.SourceSansBold,
+            TextSize = 14,
+            Parent = tabContent
+        })
         
-        local corner = Instance.new("UICorner")
-        corner.CornerRadius = UDim.new(0, 4)
-        corner.Parent = button
+        CreateCorner(button, 4)
         
         button.MouseEnter:Connect(function()
-            button.BackgroundColor3 = self.Settings.Colors.ButtonHover
+            button.BackgroundColor3 = menu.Config.Colors.ButtonHover
         end)
         
         button.MouseLeave:Connect(function()
-            button.BackgroundColor3 = self.Settings.Colors.Button
+            button.BackgroundColor3 = menu.Config.Colors.Button
         end)
         
         button.MouseButton1Click:Connect(callback)
         
-        table.insert(self.Tabs[name].Elements, button)
         return button
     end
     
     function tabMethods:AddToggle(text, default, callback)
-        local toggleFrame = Instance.new("Frame")
-        toggleFrame.Size = UDim2.new(0, 150, 0, 30)
-        toggleFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-        toggleFrame.Parent = tabContent
+        local toggleFrame = Create("Frame", {
+            Size = UDim2.new(0, 150, 0, 30),
+            BackgroundTransparency = 1,
+            Parent = tabContent
+        })
         
-        local toggleText = Instance.new("TextLabel")
-        toggleText.Size = UDim2.new(0.7, 0, 1, 0)
-        toggleText.BackgroundTransparency = 1
-        toggleText.TextColor3 = self.Settings.Colors.Text
-        toggleText.Text = text
-        toggleText.Font = Enum.Font.SourceSans
-        toggleText.TextSize = 14
-        toggleText.TextXAlignment = Enum.TextXAlignment.Left
-        toggleText.Parent = toggleFrame
+        local toggleText = Create("TextLabel", {
+            Size = UDim2.new(0.7, 0, 1, 0),
+            BackgroundTransparency = 1,
+            TextColor3 = menu.Config.Colors.Text,
+            Text = text,
+            Font = Enum.Font.SourceSans,
+            TextSize = 14,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            Parent = toggleFrame
+        })
         
-        local toggleButton = Instance.new("TextButton")
-        toggleButton.Size = UDim2.new(0, 30, 0, 20)
-        toggleButton.Position = UDim2.new(0.8, -15, 0.5, -10)
-        toggleButton.BackgroundColor3 = default and self.Settings.Colors.ToggleOn or self.Settings.Colors.ToggleOff
-        toggleButton.Text = ""
-        toggleButton.Parent = toggleFrame
+        local toggleButton = Create("TextButton", {
+            Size = UDim2.new(0, 30, 0, 20),
+            Position = UDim2.new(0.8, -15, 0.5, -10),
+            BackgroundColor3 = default and menu.Config.Colors.ToggleOn or menu.Config.Colors.ToggleOff,
+            Text = "",
+            Parent = toggleFrame
+        })
         
-        local corner = Instance.new("UICorner")
-        corner.CornerRadius = UDim.new(0, 4)
-        corner.Parent = toggleButton
+        CreateCorner(toggleButton, 4)
         
         local state = default or false
         
         local function updateToggle()
-            if state then
-                toggleButton.BackgroundColor3 = self.Settings.Colors.ToggleOn
-            else
-                toggleButton.BackgroundColor3 = self.Settings.Colors.ToggleOff
-            end
+            toggleButton.BackgroundColor3 = state and menu.Config.Colors.ToggleOn or menu.Config.Colors.ToggleOff
         end
         
         toggleButton.MouseButton1Click:Connect(function()
@@ -294,70 +363,78 @@ function BladeMenu:CreateTab(name, icon)
             if callback then callback(state) end
         end)
         
-        table.insert(self.Tabs[name].Elements, toggleFrame)
-        return toggleFrame
+        return {Frame = toggleFrame, SetState = function(newState) state = newState; updateToggle() end, GetState = function() return state end}
     end
     
-    function tabMethods:AddLabel(text)
-        local label = Instance.new("TextLabel")
-        label.Size = UDim2.new(0, 150, 0, 25)
-        label.BackgroundTransparency = 1
-        label.TextColor3 = self.Settings.Colors.Text
-        label.Text = text
-        label.Font = Enum.Font.SourceSansBold
-        label.TextSize = 16
-        label.Parent = tabContent
+    function tabMethods:AddLabel(text, size)
+        local label = Create("TextLabel", {
+            Size = UDim2.new(0, 150, 0, size or 25),
+            BackgroundTransparency = 1,
+            TextColor3 = menu.Config.Colors.Text,
+            Text = text,
+            Font = Enum.Font.SourceSansBold,
+            TextSize = size and math.min(size, 16) or 16,
+            TextWrapped = true,
+            Parent = tabContent
+        })
         
-        table.insert(self.Tabs[name].Elements, label)
         return label
     end
     
     function tabMethods:AddSlider(name, min, max, default, callback)
-        local sliderFrame = Instance.new("Frame")
-        sliderFrame.Size = UDim2.new(0, 150, 0, 50)
-        sliderFrame.BackgroundTransparency = 1
-        sliderFrame.Parent = tabContent
+        local sliderFrame = Create("Frame", {
+            Size = UDim2.new(0, 150, 0, 50),
+            BackgroundTransparency = 1,
+            Parent = tabContent
+        })
         
-        local sliderName = Instance.new("TextLabel")
-        sliderName.Size = UDim2.new(1, 0, 0, 20)
-        sliderName.BackgroundTransparency = 1
-        sliderName.TextColor3 = self.Settings.Colors.Text
-        sliderName.Text = name
-        sliderName.Font = Enum.Font.SourceSans
-        sliderName.TextSize = 14
-        sliderName.Parent = sliderFrame
+        local sliderName = Create("TextLabel", {
+            Size = UDim2.new(1, 0, 0, 20),
+            BackgroundTransparency = 1,
+            TextColor3 = menu.Config.Colors.Text,
+            Text = name,
+            Font = Enum.Font.SourceSans,
+            TextSize = 14,
+            Parent = sliderFrame
+        })
         
-        local sliderTrack = Instance.new("Frame")
-        sliderTrack.Size = UDim2.new(1, 0, 0, 5)
-        sliderTrack.Position = UDim2.new(0, 0, 0, 25)
-        sliderTrack.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-        sliderTrack.Parent = sliderFrame
+        local sliderTrack = Create("Frame", {
+            Size = UDim2.new(1, 0, 0, 5),
+            Position = UDim2.new(0, 0, 0, 25),
+            BackgroundColor3 = Color3.fromRGB(80, 80, 80),
+            Parent = sliderFrame
+        })
         
-        local sliderFill = Instance.new("Frame")
-        sliderFill.Size = UDim2.new((default - min) / (max - min), 0, 1, 0)
-        sliderFill.BackgroundColor3 = self.Settings.Colors.Accent
-        sliderFill.Parent = sliderTrack
+        CreateCorner(sliderTrack, 3)
         
-        local sliderButton = Instance.new("TextButton")
-        sliderButton.Size = UDim2.new(0, 15, 0, 15)
-        sliderButton.Position = UDim2.new((default - min) / (max - min), -7, 0.5, -7)
-        sliderButton.BackgroundColor3 = self.Settings.Colors.Text
-        sliderButton.Text = ""
-        sliderButton.Parent = sliderFrame
+        local sliderFill = Create("Frame", {
+            Size = UDim2.new((default - min) / (max - min), 0, 1, 0),
+            BackgroundColor3 = menu.Config.Colors.Accent,
+            Parent = sliderTrack
+        })
         
-        local sliderValue = Instance.new("TextLabel")
-        sliderValue.Size = UDim2.new(1, 0, 0, 15)
-        sliderValue.Position = UDim2.new(0, 0, 0, 35)
-        sliderValue.BackgroundTransparency = 1
-        sliderValue.TextColor3 = self.Settings.Colors.Text
-        sliderValue.Text = tostring(default)
-        sliderValue.Font = Enum.Font.SourceSans
-        sliderValue.TextSize = 12
-        sliderValue.Parent = sliderFrame
+        CreateCorner(sliderFill, 3)
         
-        local corner = Instance.new("UICorner")
-        corner.CornerRadius = UDim.new(0, 7)
-        corner.Parent = sliderButton
+        local sliderButton = Create("TextButton", {
+            Size = UDim2.new(0, 15, 0, 15),
+            Position = UDim2.new((default - min) / (max - min), -7, 0.5, -7),
+            BackgroundColor3 = menu.Config.Colors.Text,
+            Text = "",
+            Parent = sliderFrame
+        })
+        
+        CreateCorner(sliderButton, 7)
+        
+        local sliderValue = Create("TextLabel", {
+            Size = UDim2.new(1, 0, 0, 15),
+            Position = UDim2.new(0, 0, 0, 35),
+            BackgroundTransparency = 1,
+            TextColor3 = menu.Config.Colors.Text,
+            Text = tostring(default),
+            Font = Enum.Font.SourceSans,
+            TextSize = 12,
+            Parent = sliderFrame
+        })
         
         local dragging = false
         local currentValue = default
@@ -367,7 +444,7 @@ function BladeMenu:CreateTab(name, icon)
             currentValue = value
             sliderFill.Size = UDim2.new((value - min) / (max - min), 0, 1, 0)
             sliderButton.Position = UDim2.new((value - min) / (max - min), -7, 0.5, -7)
-            sliderValue.Text = tostring(math.floor(value * 100) / 100)
+            sliderValue.Text = string.format("%.2f", value)
             
             if callback then callback(value) end
         end
@@ -384,7 +461,7 @@ function BladeMenu:CreateTab(name, icon)
         
         sliderTrack.MouseButton1Down:Connect(function(x, y)
             local relativeX = x - sliderTrack.AbsolutePosition.X
-            local percentage = relativeX / sliderTrack.AbsoluteSize.X
+            local percentage = math.clamp(relativeX / sliderTrack.AbsoluteSize.X, 0, 1)
             updateSlider(min + (max - min) * percentage)
         end)
         
@@ -396,53 +473,60 @@ function BladeMenu:CreateTab(name, icon)
             end
         end)
         
-        table.insert(self.Tabs[name].Elements, sliderFrame)
-        return sliderFrame
+        return {Frame = sliderFrame, GetValue = function() return currentValue end, SetValue = updateSlider}
     end
     
-    function tabMethods:AddDropdown(name, options, callback)
-        local dropdownFrame = Instance.new("Frame")
-        dropdownFrame.Size = UDim2.new(0, 150, 0, 30)
-        dropdownFrame.BackgroundColor3 = self.Settings.Colors.Button
-        dropdownFrame.Parent = tabContent
+    function tabMethods:AddDropdown(name, options, defaultIndex, callback)
+        local dropdownFrame = Create("Frame", {
+            Size = UDim2.new(0, 150, 0, 30),
+            BackgroundColor3 = menu.Config.Colors.Button,
+            Parent = tabContent
+        })
         
-        local dropdownText = Instance.new("TextLabel")
-        dropdownText.Size = UDim2.new(0.8, 0, 1, 0)
-        dropdownText.BackgroundTransparency = 1
-        dropdownText.TextColor3 = self.Settings.Colors.Text
-        dropdownText.Text = name .. ": " .. options[1]
-        dropdownText.Font = Enum.Font.SourceSans
-        dropdownText.TextSize = 14
-        dropdownText.TextXAlignment = Enum.TextXAlignment.Left
-        dropdownText.Parent = dropdownFrame
+        CreateCorner(dropdownFrame, 4)
         
-        local dropdownButton = Instance.new("TextButton")
-        dropdownButton.Size = UDim2.new(0, 30, 0, 30)
-        dropdownButton.Position = UDim2.new(0.8, 0, 0, 0)
-        dropdownButton.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
-        dropdownButton.Text = "▼"
-        dropdownButton.TextColor3 = self.Settings.Colors.Text
-        dropdownButton.Font = Enum.Font.SourceSansBold
-        dropdownButton.TextSize = 12
-        dropdownButton.Parent = dropdownFrame
+        local dropdownText = Create("TextLabel", {
+            Size = UDim2.new(0.8, 0, 1, 0),
+            BackgroundTransparency = 1,
+            TextColor3 = menu.Config.Colors.Text,
+            Text = name .. ": " .. (options[defaultIndex or 1] or ""),
+            Font = Enum.Font.SourceSans,
+            TextSize = 14,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            Parent = dropdownFrame
+        })
         
-        local dropdownList = Instance.new("ScrollingFrame")
-        dropdownList.Size = UDim2.new(1, 0, 0, 0)
-        dropdownList.Position = UDim2.new(0, 0, 1, 2)
-        dropdownList.BackgroundColor3 = self.Settings.Colors.Button
-        dropdownList.Visible = false
-        dropdownList.ScrollBarThickness = 4
-        dropdownList.Parent = dropdownFrame
+        local dropdownButton = Create("TextButton", {
+            Size = UDim2.new(0, 30, 0, 30),
+            Position = UDim2.new(0.8, 0, 0, 0),
+            BackgroundColor3 = Color3.fromRGB(70, 70, 70),
+            Text = "▼",
+            TextColor3 = menu.Config.Colors.Text,
+            Font = Enum.Font.SourceSansBold,
+            TextSize = 12,
+            Parent = dropdownFrame
+        })
         
-        local listLayout = Instance.new("UIListLayout")
-        listLayout.Parent = dropdownList
+        CreateCorner(dropdownButton, 4)
         
-        local corner = Instance.new("UICorner")
-        corner.CornerRadius = UDim.new(0, 4)
-        corner.Parent = dropdownFrame
+        local dropdownList = Create("ScrollingFrame", {
+            Size = UDim2.new(1, 0, 0, 0),
+            Position = UDim2.new(0, 0, 1, 2),
+            BackgroundColor3 = menu.Config.Colors.Button,
+            Visible = false,
+            ScrollBarThickness = 4,
+            BorderSizePixel = 0,
+            Parent = dropdownFrame
+        })
+        
+        CreateCorner(dropdownList, 4)
+        
+        local listLayout = Create("UIListLayout", {
+            Parent = dropdownList
+        })
         
         local isOpen = false
-        local selectedOption = options[1]
+        local selectedOption = options[defaultIndex or 1]
         
         local function updateDropdown()
             dropdownText.Text = name .. ": " .. selectedOption
@@ -462,15 +546,26 @@ function BladeMenu:CreateTab(name, icon)
         
         -- Preencher opções
         for i, option in ipairs(options) do
-            local optionButton = Instance.new("TextButton")
-            optionButton.Size = UDim2.new(1, 0, 0, 25)
-            optionButton.Position = UDim2.new(0, 0, 0, (i-1)*25)
-            optionButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-            optionButton.TextColor3 = self.Settings.Colors.Text
-            optionButton.Text = option
-            optionButton.Font = Enum.Font.SourceSans
-            optionButton.TextSize = 12
-            optionButton.Parent = dropdownList
+            local optionButton = Create("TextButton", {
+                Size = UDim2.new(1, -4, 0, 25),
+                Position = UDim2.new(0, 2, 0, (i-1)*25),
+                BackgroundColor3 = Color3.fromRGB(50, 50, 50),
+                TextColor3 = menu.Config.Colors.Text,
+                Text = option,
+                Font = Enum.Font.SourceSans,
+                TextSize = 12,
+                Parent = dropdownList
+            })
+            
+            CreateCorner(optionButton, 2)
+            
+            optionButton.MouseEnter:Connect(function()
+                optionButton.BackgroundColor3 = menu.Config.Colors.ButtonHover
+            end)
+            
+            optionButton.MouseLeave:Connect(function()
+                optionButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+            end)
             
             optionButton.MouseButton1Click:Connect(function()
                 selectedOption = option
@@ -482,124 +577,202 @@ function BladeMenu:CreateTab(name, icon)
         
         dropdownButton.MouseButton1Click:Connect(toggleDropdown)
         
-        table.insert(self.Tabs[name].Elements, dropdownFrame)
-        return dropdownFrame
+        -- Fechar dropdown ao clicar fora
+        UserInputService.InputBegan:Connect(function(input)
+            if isOpen and input.UserInputType == Enum.UserInputType.MouseButton1 then
+                local mousePos = input.Position
+                local framePos = dropdownFrame.AbsolutePosition
+                local frameSize = dropdownFrame.AbsoluteSize
+                
+                if mousePos.X < framePos.X or mousePos.X > framePos.X + frameSize.X or
+                   mousePos.Y < framePos.Y or mousePos.Y > framePos.Y + frameSize.Y + dropdownList.AbsoluteSize.Y then
+                    toggleDropdown()
+                end
+            end
+        end)
+        
+        updateDropdown()
+        
+        return {Frame = dropdownFrame, GetValue = function() return selectedOption end, SetValue = function(val) selectedOption = val; updateDropdown() end}
     end
     
     function tabMethods:AddTextBox(placeholder, callback)
-        local textBoxFrame = Instance.new("Frame")
-        textBoxFrame.Size = UDim2.new(0, 150, 0, 30)
-        textBoxFrame.BackgroundColor3 = self.Settings.Colors.Button
-        textBoxFrame.Parent = tabContent
+        local textBoxFrame = Create("Frame", {
+            Size = UDim2.new(0, 150, 0, 30),
+            BackgroundColor3 = menu.Config.Colors.Button,
+            Parent = tabContent
+        })
         
-        local textBox = Instance.new("TextBox")
-        textBox.Size = UDim2.new(1, -10, 1, -10)
-        textBox.Position = UDim2.new(0, 5, 0, 5)
-        textBox.BackgroundTransparency = 1
-        textBox.TextColor3 = self.Settings.Colors.Text
-        textBox.PlaceholderText = placeholder
-        textBox.Font = Enum.Font.SourceSans
-        textBox.TextSize = 14
-        textBox.ClearTextOnFocus = false
-        textBox.Parent = textBoxFrame
+        CreateCorner(textBoxFrame, 4)
         
-        local corner = Instance.new("UICorner")
-        corner.CornerRadius = UDim.new(0, 4)
-        corner.Parent = textBoxFrame
+        local textBox = Create("TextBox", {
+            Size = UDim2.new(1, -10, 1, -10),
+            Position = UDim2.new(0, 5, 0, 5),
+            BackgroundTransparency = 1,
+            TextColor3 = menu.Config.Colors.Text,
+            PlaceholderText = placeholder,
+            PlaceholderColor3 = Color3.fromRGB(150, 150, 150),
+            Font = Enum.Font.SourceSans,
+            TextSize = 14,
+            ClearTextOnFocus = false,
+            Parent = textBoxFrame
+        })
         
         textBox.FocusLost:Connect(function(enterPressed)
             if enterPressed and callback then
                 callback(textBox.Text)
+                textBox.Text = ""
             end
         end)
         
-        table.insert(self.Tabs[name].Elements, textBoxFrame)
-        return textBox
+        return {Frame = textBoxFrame, GetText = function() return textBox.Text end, SetText = function(text) textBox.Text = text end}
     end
     
     function tabMethods:AddSeparator()
-        local separator = Instance.new("Frame")
-        separator.Size = UDim2.new(0, 150, 0, 1)
-        separator.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-        separator.Parent = tabContent
+        local separator = Create("Frame", {
+            Size = UDim2.new(0, 150, 0, 1),
+            BackgroundColor3 = Color3.fromRGB(100, 100, 100),
+            Parent = tabContent
+        })
         
-        table.insert(self.Tabs[name].Elements, separator)
         return separator
     end
     
-    -- Mostrar a primeira aba criada
-    if not self.CurrentTab then
-        showTab()
+    -- Armazenar referência da tab
+    menu.Tabs[name:lower()] = {
+        Button = tabButton,
+        Content = tabContent,
+        Methods = tabMethods
+    }
+    
+    -- Se for a primeira tab, mostrar ela
+    if #menu.TabHolder:GetChildren() == 1 then
+        tabContent.Visible = true
+        menu.ActiveTab = name:lower()
     end
     
     return tabMethods
 end
 
--- Função para mostrar/esconder o menu
-function BladeMenu:Toggle()
-    self.GUI.Enabled = not self.GUI.Enabled
-end
-
--- Função para mostrar notificação
-function BladeMenu:Notify(text, duration)
-    duration = duration or 3
-    game:GetService("StarterGui"):SetCore("SendNotification", {
-        Title = "Blade MENU",
-        Text = text,
-        Duration = duration
-    })
-    print("[Blade MENU] " .. text)
-end
-
--- Função para obter uma aba pelo nome
-function BladeMenu:GetTab(name)
-    return self.Tabs[name]
-end
-
--- Função para mostrar uma aba específica
-function BladeMenu:ShowTab(name)
-    local tab = self.Tabs[name]
-    if tab then
-        for tabName, tabData in pairs(self.Tabs) do
-            tabData.Content.Visible = false
-        end
-        tab.Content.Visible = true
-        self.CurrentTab = name
+-- Função principal de inicialização
+function BladeMenu.Init(config)
+    -- Mesclar configurações
+    local mergedConfig = {}
+    for k, v in pairs(BladeMenu.DefaultConfig) do
+        mergedConfig[k] = v
     end
+    
+    if config then
+        for k, v in pairs(config) do
+            if k == "Colors" then
+                mergedConfig.Colors = mergedConfig.Colors or {}
+                for colorKey, colorValue in pairs(v) do
+                    mergedConfig.Colors[colorKey] = colorValue
+                end
+            else
+                mergedConfig[k] = v
+            end
+        end
+    end
+    
+    -- Criar objeto do menu
+    local menu = {
+        Config = mergedConfig,
+        GUI = nil,
+        MainFrame = nil,
+        Header = nil,
+        TabHolder = nil,
+        ContentPage = nil,
+        ContentScroller = nil,
+        ContentLayout = nil,
+        TitleLabel = nil,
+        MinButton = nil,
+        CloseButton = nil,
+        ActiveTab = nil,
+        Tabs = {},
+        IsEnabled = true
+    }
+    
+    -- Métodos públicos
+    function menu:CreateTab(name, icon)
+        return CreateTab(self, name, icon)
+    end
+    
+    function menu:Toggle()
+        self.GUI.Enabled = not self.GUI.Enabled
+        self.IsEnabled = self.GUI.Enabled
+        ShowNotification("Menu " .. (self.GUI.Enabled and "aberto" or "fechado"), 2)
+    end
+    
+    function menu:Show()
+        self.GUI.Enabled = true
+        self.IsEnabled = true
+    end
+    
+    function menu:Hide()
+        self.GUI.Enabled = false
+        self.IsEnabled = false
+    end
+    
+    function menu:IsVisible()
+        return self.GUI.Enabled
+    end
+    
+    function menu:Notify(text, duration)
+        ShowNotification(text, duration)
+    end
+    
+    function menu:SetTitle(title)
+        self.Config.Title = title
+        if self.TitleLabel then
+            self.TitleLabel.Text = title
+        end
+    end
+    
+    function menu:SetSize(width, height)
+        self.Config.Size = {Width = width, Height = height}
+        if self.MainFrame then
+            self.MainFrame.Size = UDim2.new(0, width, 0, height)
+        end
+    end
+    
+    function menu:SetPosition(x, y)
+        self.Config.Position = {X = x, Y = y}
+        if self.MainFrame then
+            self.MainFrame.Position = UDim2.new(x, 0, y, 0)
+        end
+    end
+    
+    function menu:SetKeybind(key)
+        self.Config.Keybind = key
+    end
+    
+    function menu:GetTab(name)
+        return self.Tabs[name:lower()] and self.Tabs[name:lower()].Methods or nil
+    end
+    
+    function menu:ShowTab(name)
+        for tabName, tabData in pairs(self.Tabs) do
+            tabData.Content.Visible = (tabName == name:lower())
+        end
+        self.ActiveTab = name:lower()
+    end
+    
+    function menu:Destroy()
+        if self.GUI then
+            self.GUI:Destroy()
+        end
+    end
+    
+    -- Criar a UI
+    CreateBaseUI(menu)
+    SetupEvents(menu)
+    
+    -- Notificação inicial
+    ShowNotification("Blade MENU v" .. BladeMenu.Version .. " carregado!", 3)
+    
+    return menu
 end
 
--- Função para mudar o título
-function BladeMenu:SetTitle(newTitle)
-    self.Settings.Title = newTitle
-    self.Header.TextLabel.Text = newTitle
-end
-
--- Função para mudar o tamanho
-function BladeMenu:SetSize(width, height)
-    self.Settings.Size = {Width = width, Height = height}
-    self.MainFrame.Size = UDim2.new(0, width, 0, height)
-end
-
--- Função para mudar a posição
-function BladeMenu:SetPosition(x, y)
-    self.Settings.Position = {X = x, Y = y}
-    self.MainFrame.Position = UDim2.new(x, 0, y, 0)
-end
-
--- Função para mudar uma cor específica
-function BladeMenu:SetColor(colorName, color)
-    self.Settings.Colors[colorName] = color
-    -- Aqui você pode adicionar a lógica para atualizar a UI dinamicamente se necessário
-end
-
--- Função para mudar o keybind
-function BladeMenu:SetKeybind(newKey)
-    self.Settings.Keybind = newKey
-end
-
--- Função para exportar como loadstring
-local function LoadBladeMenu()
-    return BladeMenu
-end
-
-return LoadBladeMenu()
+-- Exportar
+return BladeMenu
