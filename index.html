@@ -1,650 +1,1322 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fluxl - Main</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Oxanium:wght@400;600;700&display=swap" rel="stylesheet">
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>AverionX | Dashboard Web com Executor Roblox</title>
+    <meta name="description" content="Dashboard web avançado integrado com menu EXE para execução de scripts e injeção automática no Roblox. UI interativa e funcionalidades personalizadas."/>
+    <meta name="author" content="AverionX Team"/>
+    <meta name="keywords" content="averionx, executor roblox, roblox executor, script executor, injector roblox, dashboard roblox"/>
+    <meta property="og:title" content="AverionX - Dashboard Web com Executor Roblox"/>
+    <meta property="og:description" content="Dashboard web avançado com execução de scripts e injeção automática no Roblox"/>
+    <meta property="og:type" content="website"/>
     <style>
+        /* Reset e estilos gerais */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
         }
-        
+
+        :root {
+            --primary: #ff003c;
+            --primary-dark: #cc002f;
+            --primary-glow: rgba(255, 0, 60, 0.7);
+            --background: #0a0a0a;
+            --card-bg: #111111;
+            --card-border: #222222;
+            --text: #ffffff;
+            --text-muted: #999999;
+            --success: #00ff88;
+            --warning: #ffaa00;
+            --danger: #ff003c;
+            --gradient: linear-gradient(135deg, #ff003c, #ff2b6e);
+        }
+
         body {
-            font-family: 'Oxanium', sans-serif;
-            background-color: #000000;
-            color: #ffffff;
+            background-color: var(--background);
+            color: var(--text);
             overflow-x: hidden;
-            line-height: 1.6;
+            position: relative;
+            min-height: 100vh;
         }
-        
-        #particles-js {
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(255, 0, 60, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(255, 0, 60, 0.1) 0%, transparent 50%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Grid de fundo */
+        .grid-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(255, 0, 60, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 0, 60, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Animação de partículas */
+        .particles {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             z-index: -1;
-            background: linear-gradient(to bottom, #000000 0%, #222222 100%);
+            pointer-events: none;
         }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-            z-index: 1;
-        }
-        
-        header {
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-        
-        .title {
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 5.5rem;
-            margin-bottom: 1.5rem;
-            color: #ffffff;
-            text-shadow: 0 0 8px #ffffff, 0 0 16px rgba(255, 255, 255, 0.5);
-            letter-spacing: 3px;
-            font-weight: 700;
-            position: relative;
-            display: inline-block;
-        }
-        
-        .title::after {
-            content: '';
+
+        .particle {
             position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60%;
-            height: 3px;
-            background: linear-gradient(90deg, transparent, #ffffff, transparent);
+            background: var(--primary);
             border-radius: 50%;
-            filter: blur(1px);
+            opacity: 0.3;
+            animation: float 20s infinite linear;
         }
-        
-        .download-section {
-            display: flex;
-            justify-content: center;
-            gap: 3rem;
-            margin-bottom: 4rem;
-            flex-wrap: wrap;
+
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); }
+            100% { transform: translateY(-100vh) rotate(360deg); }
         }
-        
-        .download-card {
-            background: rgba(50, 50, 50, 0.7);
-            border-radius: 15px;
-            padding: 2.5rem;
-            width: 100%;
-            max-width: 500px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            transition: transform 0.3s ease;
-        }
-        
-        .download-card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .download-title {
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 2rem;
-            color: #ffffff;
-            margin-bottom: 1.5rem;
-            text-align: center;
-        }
-        
-        .download-features {
-            margin: 2rem 0;
-            list-style-type: none;
-        }
-        
-        .download-features li {
-            margin-bottom: 0.8rem;
-            position: relative;
-            padding-left: 1.5rem;
-            color: #dddddd;
-        }
-        
-        .download-features li::before {
-            content: '•';
-            color: #ffffff;
-            position: absolute;
+
+        /* Navbar */
+        .navbar {
+            position: fixed;
+            top: 0;
             left: 0;
-            font-weight: bold;
-        }
-        
-        .download-btn {
-            display: inline-block;
-            background: linear-gradient(45deg, #333333, #555555);
-            color: white;
-            padding: 1rem 2.5rem;
-            border-radius: 50px;
-            text-decoration: none;
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-top: 1rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            cursor: pointer;
             width: 100%;
-            text-align: center;
-        }
-        
-        .download-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(255, 255, 255, 0.2);
-            background: linear-gradient(45deg, #444444, #666666);
-        }
-        
-        .premium-btn {
-            display: inline-block;
-            background: linear-gradient(45deg, #888888, #aaaaaa);
-            color: #000000;
-            padding: 1rem 2.5rem;
-            border-radius: 50px;
-            text-decoration: none;
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 1.2rem;
-            font-weight: 700;
-            margin-top: 1rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            cursor: pointer;
-            width: 100%;
-            text-align: center;
-        }
-        
-        .premium-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(255, 255, 255, 0.3);
-            background: linear-gradient(45deg, #999999, #bbbbbb);
-        }
-        
-        .download-size {
-            display: block;
-            margin-top: 1rem;
-            color: #aaaaaa;
-            font-size: 0.9rem;
-            text-align: center;
-        }
-        
-        .category-title {
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 3rem;
-            color: #ffffff;
-            text-shadow: 0 0 10px #ffffff, 0 0 20px rgba(255, 255, 255, 0.5);
-            text-align: center;
-            margin: 2rem 0;
-            width: 100%;
-        }
-        
-        .category-description {
-            text-align: center;
-            margin-bottom: 2rem;
-            font-size: 1.1rem;
-            color: #cccccc;
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        
-        .about-section {
-            background: rgba(30, 30, 30, 0.7);
-            border-radius: 15px;
-            padding: 3rem;
-            margin-top: 3rem;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .about-title {
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 2.5rem;
-            color: #ffffff;
-            margin-bottom: 1.5rem;
-            text-align: center;
-        }
-        
-        .about-tabs {
+            padding: 1.5rem 2rem;
+            background: rgba(10, 10, 10, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 0, 60, 0.2);
+            z-index: 1000;
             display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-        }
-        
-        .about-tab {
-            padding: 0.8rem 1.5rem;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: #ffffff;
-        }
-        
-        .about-tab:hover, .about-tab.active {
-            background: rgba(255, 255, 255, 0.3);
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
-        }
-        
-        .about-content {
-            display: none;
-            animation: fadeIn 0.5s ease;
-            color: #dddddd;
-        }
-        
-        .about-content.active {
-            display: block;
-        }
-        
-        .history-item {
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .history-date {
-            color: #ffffff;
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-        }
-        
-        .plan-item {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 1.5rem;
-            border-radius: 10px;
-            margin-bottom: 1.5rem;
-            border-left: 3px solid #ffffff;
-        }
-        
-        .plan-title {
-            font-family: 'Rajdhani', sans-serif;
-            color: #ffffff;
-            margin-bottom: 0.5rem;
-            display: flex;
+            justify-content: space-between;
             align-items: center;
         }
-        
-        .plan-status {
-            display: inline-block;
-            padding: 0.3rem 0.8rem;
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo-icon::after {
+            content: 'X';
+            color: white;
+            font-weight: 900;
+            font-size: 1.5rem;
+            text-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #fff, var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 0.5rem 0;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--primary);
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: var(--gradient);
+            color: white;
+            box-shadow: 0 4px 20px rgba(255, 0, 60, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(255, 0, 60, 0.5);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid rgba(255, 0, 60, 0.5);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 0, 60, 0.1);
+            border-color: var(--primary);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 12rem 2rem 6rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            background: rgba(255, 0, 60, 0.1);
+            border: 1px solid rgba(255, 0, 60, 0.3);
             border-radius: 50px;
-            font-size: 0.8rem;
-            margin-left: 1rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
         }
-        
-        .status-planned {
-            background: rgba(170, 170, 170, 0.2);
-            color: #aaaaaa;
+
+        .badge-dot {
+            width: 10px;
+            height: 10px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
         }
-        
-        .status-progress {
-            background: rgba(170, 170, 170, 0.2);
-            color: #cccccc;
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
-        
-        .status-completed {
-            background: rgba(255, 255, 255, 0.2);
-            color: #ffffff;
+
+        .hero-title {
+            font-size: 4.5rem;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, #fff, var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-        
-        .log-entry {
-            margin-bottom: 1rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            max-width: 800px;
+            margin: 0 auto 3rem;
+            line-height: 1.6;
         }
-        
-        .log-date {
-            color: #bbbbbb;
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            max-width: 800px;
+            margin: 4rem auto;
+        }
+
+        .stat-card {
+            background: rgba(255, 0, 60, 0.05);
+            border: 1px solid rgba(255, 0, 60, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(255, 0, 60, 0.2);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
             font-size: 0.9rem;
-            margin-bottom: 0.3rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+
+        /* Features Section */
+        .section {
+            padding: 6rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
         }
-        
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 0, 60, 0.1);
+            border: 1px solid rgba(255, 0, 60, 0.3);
+            border-radius: 50px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .section-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+
+        .section-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, transparent, rgba(255, 0, 60, 0.05));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 0, 60, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .feature-icon::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: inherit;
+        }
+
+        .feature-card:hover .feature-icon::after {
+            opacity: 1;
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .feature-description {
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* Dashboard Preview */
+        .dashboard-preview {
+            background: linear-gradient(to bottom, transparent, rgba(255, 0, 60, 0.05));
+            padding: 4rem 2rem;
+            border-radius: 24px;
+            margin-top: 4rem;
+        }
+
+        .dashboard-tabs {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .dashboard-tab {
+            padding: 0.75rem 1.5rem;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .dashboard-tab.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 20px rgba(255, 0, 60, 0.3);
+        }
+
+        .dashboard-display {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 2rem;
+            min-height: 400px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dashboard-ui {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 2rem;
+            height: 350px;
+        }
+
+        .sidebar {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        .menu-item {
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--text-muted);
+        }
+
+        .menu-item.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .menu-item:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text);
+        }
+
+        .content-area {
+            display: grid;
+            grid-template-rows: auto 1fr;
+            gap: 1rem;
+        }
+
+        .script-editor {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 1rem;
+            font-family: 'Consolas', monospace;
+            font-size: 0.9rem;
+            color: var(--success);
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        /* FAQ Section */
+        .faq-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .faq-item {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        .faq-question {
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .faq-question:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .faq-answer {
+            padding: 0 1.5rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            color: var(--text-muted);
+        }
+
+        .faq-item.active .faq-answer {
+            padding: 0 1.5rem 1.5rem;
+            max-height: 500px;
+        }
+
+        .faq-toggle {
+            color: var(--primary);
+            transition: transform 0.3s ease;
+        }
+
+        .faq-item.active .faq-toggle {
+            transform: rotate(45deg);
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: 8rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-card {
+            background: linear-gradient(135deg, rgba(255, 0, 60, 0.1), rgba(255, 0, 60, 0.05));
+            border: 1px solid rgba(255, 0, 60, 0.2);
+            border-radius: 24px;
+            padding: 4rem;
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 0, 60, 0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .cta-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 4rem 2rem 2rem;
+            background: rgba(0, 0, 0, 0.5);
+            border-top: 1px solid rgba(255, 0, 60, 0.2);
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-text {
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .footer-links h3 {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            color: var(--text);
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.75rem;
+        }
+
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Responsividade */
         @media (max-width: 768px) {
-            .title {
-                font-size: 3.5rem;
+            .hero-title {
+                font-size: 3rem;
             }
             
-            .download-section {
-                flex-direction: column;
-                align-items: center;
+            .section-title {
+                font-size: 2.5rem;
             }
             
-            .about-tabs {
-                flex-direction: column;
-                align-items: center;
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
             }
             
-            .about-tab {
-                width: 100%;
-                text-align: center;
+            .nav-links {
+                display: none;
             }
+            
+            .hero {
+                padding: 10rem 1rem 4rem;
+            }
+            
+            .section {
+                padding: 4rem 1rem;
+            }
+            
+            .cta-card {
+                padding: 2rem;
+            }
+            
+            .dashboard-ui {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .btn {
+                padding: 0.75rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Scrollbar personalizada */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--background);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
         }
     </style>
 </head>
 <body>
-    <div id="particles-js"></div>
+    <!-- Grid de fundo -->
+    <div class="grid-bg"></div>
     
-    <div class="container">
-        <header>
-            <h1 class="title">Fluxl Team</h1>
-            <p style="max-width: 800px; margin: 0 auto; font-size: 1.2rem;">
-                A plataforma definitiva para execução de scripts com desempenho e controle total
+    <!-- Partículas animadas -->
+    <div class="particles" id="particles"></div>
+    
+    <!-- Navbar -->
+    <nav class="navbar">
+        <a href="#" class="logo">
+            <div class="logo-icon"></div>
+            <span class="logo-text">AVERIONX</span>
+        </a>
+        
+        <div class="nav-links">
+            <a href="#features" class="nav-link">Funcionalidades</a>
+            <a href="#dashboard" class="nav-link">Dashboard</a>
+            <a href="#faq" class="nav-link">FAQ</a>
+        </div>
+        
+        <div class="nav-buttons">
+            <a href="#" class="btn btn-secondary">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+                Discord
+            </a>
+            <a href="#download" class="btn btn-primary">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Download
+            </a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-badge">
+            <div class="badge-dot"></div>
+            <span>v2.5 BETA • ATUALIZADO</span>
+        </div>
+        
+        <h1 class="hero-title">
+            Dashboard Web<br>
+            <span style="color: var(--primary);">AverionX</span>
+        </h1>
+        
+        <p class="hero-subtitle">
+            Executor avançado com dashboard web integrado, menu EXE, execução de scripts e injeção automática no Roblox. 
+            Interface interativa com funcionalidades personalizadas e desempenho excepcional.
+        </p>
+        
+        <div class="nav-buttons" style="justify-content: center; margin-top: 3rem;">
+            <a href="#download" class="btn btn-primary" style="padding: 1rem 2.5rem; font-size: 1.1rem;">
+                Download Executor
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14"/>
+                    <path d="m12 5 7 7-7 7"/>
+                </svg>
+            </a>
+            <a href="#features" class="btn btn-secondary" style="padding: 1rem 2.5rem; font-size: 1.1rem;">
+                Explorar Funcionalidades
+            </a>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number">&lt;2ms</div>
+                <div class="stat-label">Injeção</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">99.9%</div>
+                <div class="stat-label">Uptime</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">24/7</div>
+                <div class="stat-label">Suporte</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">100%</div>
+                <div class="stat-label">Seguro</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="section">
+        <div class="section-header">
+            <div class="section-badge">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>
+                    <path d="M20 3v4"/>
+                    <path d="M22 5h-4"/>
+                    <path d="M4 17v2"/>
+                    <path d="M5 18H3"/>
+                </svg>
+                FUNCIONALIDADES
+            </div>
+            <h2 class="section-title">Recursos <span style="color: var(--primary);">Avançados</span></h2>
+            <p class="section-subtitle">
+                Tudo o que você precisa para uma experiência completa de execução de scripts no Roblox
             </p>
-        </header>
-        
-        <!-- Categoria Free -->
-        <h2 class="category-title">Hype - Free</h2>
-        <p class="category-description">Downloads gratuitos com recursos básicos para começar a usar o HypeX</p>
-        
-        <div class="download-section">
-            <div class="download-card">
-                <h2 class="download-title">Executor</h2>
-                <ul class="download-features">
-                    <li>Injeção ultrarrápida e estável</li>
-                    <li>Interface limpa e intuitiva</li>
-                    <li>Suporte à Cloudy & WRD integradas</li>
-                    <li>Atualizações toda semana</li>
-                    <li>Baixo consumo de recursos</li>
-                    <li>Proteção básica contra detecção</li>
-                </ul>
-                <button class="download-btn" onclick="downloadFile('HypeX_v2.zip')">Download Executor</button>
-                <span class="download-size">Tamanho: ? • Versão 2.0.1</span>
-            </div>
-            
-            <div class="download-card">
-                <h2 class="download-title">API</h2>
-                <ul class="download-features">
-                    <li>Sistema completo de injeção</li>
-                    <li>Funções básicas de execução</li>
-                    <li>Documentação detalhada incluída</li>
-                    <li>Exemplos de implementação</li>
-                    <li>Compatível com múltiplas plataformas</li>
-                    <li>Suporte à comunidade</li>
-                </ul>
-                <button class="download-btn" onclick="downloadFile('CloudyApi.dll')">Download API</button>
-                <span class="download-size">Tamanho: ? • Versão 2.1.0</span>
-            </div>
         </div>
         
-        <!-- Categoria Premium -->
-        <h2 class="category-title">PREMIUM</h2>
-        <p class="category-description">Recursos avançados e exclusivos para usuários Premium</p>
-        
-        <div class="download-section">
-            <div class="download-card">
-                <h2 class="download-title">HypeX Dashboard</h2>
-                <ul class="download-features">
-                    <li>🔰 Sistema de Administração UNIVERSAL via Patente</li>
-                    <li>Monitoramento em tempo real</li>
-                    <li>Controle remoto completo via web</li>
-                    <li>Configurações personalizáveis</li>
-                    <li>Atualizações prioritárias</li>
-                    <li>Proteção avançada contra detecção</li>
-                </ul>
-                <button class="download-btn" onclick="downloadFile('HypeX_Dashboard.zip')">Download Dashboard</button>
-                <span class="download-size">Tamanho: ? • Versão 1.5.0</span>
-                <button class="premium-btn" onclick="showPremiumModal()">ADQUIRIR PREMIUM</button>
-                <p style="text-align: center; margin-top: 1rem; color: #ffcc00; font-size: 0.9rem;">
-                    Desbloqueie todos os recursos premium por apenas R$29,90/mês
-                </p>
-            </div>
-        </div>
-        
-        <div class="about-section">
-            <h2 class="about-title">SOBRE O PROJETO</h2>
-            
-            <div class="about-tabs">
-                <div class="about-tab active" onclick="showAboutTab('overview')">Visão Geral</div>
-                <div class="about-tab" onclick="showAboutTab('plans')">Planos Futuros</div>
-                <div class="about-tab" onclick="showAboutTab('history')">História</div>
-                <div class="about-tab" onclick="showAboutTab('logs')">Changelog</div>
-            </div>
-            
-            <div id="overview" class="about-content active">
-                <h3 style="color: #ff355d; margin-bottom: 1rem;">O que é o Fluxl?</h3>
-                <p style="margin-bottom: 1.5rem;">
-                    O HypeX da Fluxl é mais que um executor - é uma plataforma completa para desenvolvimento e execução de scripts, 
-                    combinando desempenho nativo com um painel de controle web moderno.
-                </p>
-                
-                <h4 style="color: #ff6b8b; margin-bottom: 1rem;">Principais Características</h4>
-                <ul style="margin-bottom: 1.5rem; padding-left: 1.5rem;">
-                    <li style="margin-bottom: 0.5rem;">Executor otimizado em C++ para máxima performance</li>
-                    <li style="margin-bottom: 0.5rem;">Dashboard web para controle remoto</li>
-                    <li style="margin-bottom: 0.5rem;">Sistema de teleport integrado</li>
-                    <li style="margin-bottom: 0.5rem;">Monitoramento em tempo real</li>
-                </ul>
-                
-                <h4 style="color: #ff6b8b; margin-bottom: 1rem;">Próximas Atualizações</h4>
-                <p>
-                    Estamos trabalhando na integração com IA para sugestão de scripts e automação inteligente, 
-                    além de um sistema multi-usuário para times de desenvolvimento.
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                    </svg>
+                </div>
+                <h3 class="feature-title">Injeção Automática</h3>
+                <p class="feature-description">
+                    Injeção automática e instantânea no Roblox com detecção inteligente do processo.
                 </p>
             </div>
             
-            <div id="plans" class="about-content">
-                <h3 style="color: #ff355d; margin-bottom: 1.5rem;">Roadmap do Projeto</h3>
-                
-                <div class="plan-item">
-                    <h4 class="plan-title">Integração Local
-                        <span class="plan-status status-completed">CONCLUÍDO</span>
-                    </h4>
-                    <p>Conexão direta entre o dashboard web e o executor local via WebSocket/HTTP.</p>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="2" width="20" height="20" rx="2.5"/>
+                        <path d="M7 7h10"/>
+                        <path d="M7 12h10"/>
+                        <path d="M7 17h6"/>
+                    </svg>
                 </div>
-                
-                <div class="plan-item">
-                    <h4 class="plan-title">IA para Scripts
-                        <span class="plan-status status-planned">PLANEJADO</span>
-                    </h4>
-                    <p>Sistema de sugestão e autocompletar de scripts usando modelos de linguagem.</p>
-                </div>
-                
-                <div class="plan-item">
-                    <h4 class="plan-title">Sistema Multi-Usuário
-                        <span class="plan-status status-completed">CONCLUÍDO</span>
-                    </h4>
-                    <p>Controle de permissões e várias conexões simultâneas.</p>
-                </div>
-                
-                <div class="plan-item">
-                    <h4 class="plan-title">API Pública
-                        <span class="plan-status status-completed">CONCLUÍDO</span>
-                    </h4>
-                    <p>Documentação completa para desenvolvedores criarem extensões.</p>
-                </div>
+                <h3 class="feature-title">Dashboard Web</h3>
+                <p class="feature-description">
+                    Interface web completa com gerenciamento de scripts, configurações e monitoramento.
+                </p>
             </div>
             
-            <div id="history" class="about-content">
-                <h3 style="color: #ff355d; margin-bottom: 1.5rem;">Histórico de Desenvolvimento</h3>
-                
-                <div class="history-item">
-                    <div class="history-date">MARÇO 2025</div>
-                    <p>Primeiro protótipo do executor básico desenvolvido em Lua.</p>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2v4"/>
+                        <path d="m16.24 7.76 2.83-2.83"/>
+                        <path d="M18 12h4"/>
+                        <path d="m16.24 16.24 2.83 2.83"/>
+                        <path d="M12 18v4"/>
+                        <path d="m7.76 16.24-2.83 2.83"/>
+                        <path d="M6 12H2"/>
+                        <path d="m7.76 7.76-2.83-2.83"/>
+                        <circle cx="12" cy="12" r="4"/>
+                    </svg>
                 </div>
-                
-                <div class="history-item">
-                    <div class="history-date">MAIO 2025</div>
-                    <p>Migração para C++ para melhor desempenho na injeção.</p>
-                </div>
-                
-                <div class="history-item">
-                    <div class="history-date">JULHO 2025</div>
-                    <p>Primeira versão do dashboard web com Firebase.</p>
-                </div>
-                
-                <div class="history-item">
-                    <div class="history-date">JULHO 2025</div>
-                    <p>Integração inicial com modelos de IA para análise de scripts.</p>
-                </div>
+                <h3 class="feature-title">Menu EXE Integrado</h3>
+                <p class="feature-description">
+                    Menu de execução completo integrado diretamente no executor com atalhos rápidos.
+                </p>
             </div>
             
-            <div id="logs" class="about-content">
-                <h3 style="color: #ff355d; margin-bottom: 1.5rem;">Últimas Atualizações</h3>
-                
-                <div class="log-entry">
-                    <div class="log-date">Versão 2.0.2 • 19/07/2025</div>
-                    <ul style="padding-left: 1.5rem;">
-                        <li>Otimização no sistema de injeção</li>
-                        <li>Correção de bugs com o database</li>
-                        <li>Melhoria na integração com Dashboard Web</li>
-                    </ul>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/>
+                        <path d="M18 14h-8"/>
+                        <path d="M15 18h-5"/>
+                        <path d="M10 6h8v4h-8z"/>
+                    </svg>
                 </div>
-                
-                <div class="log-entry">
-                    <div class="log-date">Versão 1.0.1 • 15/07/2025</div>
-                    <ul style="padding-left: 1.5rem;">
-                        <li>Primeira versão pública</li>
-                        <li>Sistema básico de execução</li>
-                        <li>Integração inicial com dashboard</li>
-                    </ul>
+                <h3 class="feature-title">Script Hub</h3>
+                <p class="feature-description">
+                    Biblioteca integrada com scripts populares organizados por categorias.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="8" width="18" height="13" rx="2"/>
+                        <path d="M8 8V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v3"/>
+                        <path d="M12 15v3"/>
+                        <path d="M8 12h8"/>
+                    </svg>
+                </div>
+                <h3 class="feature-title">Editor Avançado</h3>
+                <p class="feature-description">
+                    Editor de scripts com syntax highlighting, autocomplete e salvamento automático.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/>
+                    </svg>
+                </div>
+                <h3 class="feature-title">Segurança Máxima</h3>
+                <p class="feature-description">
+                    Proteção avançada contra detecção com criptografia e atualizações constantes.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dashboard Preview -->
+    <section id="dashboard" class="section">
+        <div class="section-header">
+            <div class="section-badge">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/>
+                    <path d="M3 9h18"/>
+                    <path d="M9 21V9"/>
+                </svg>
+                DASHBOARD
+            </div>
+            <h2 class="section-title">Interface <span style="color: var(--primary);">Interativa</span></h2>
+            <p class="section-subtitle">
+                Dashboard web completo com controle total sobre a execução de scripts
+            </p>
+        </div>
+        
+        <div class="dashboard-preview">
+            <div class="dashboard-tabs">
+                <div class="dashboard-tab active">Painel Principal</div>
+                <div class="dashboard-tab">Editor de Scripts</div>
+                <div class="dashboard-tab">Script Hub</div>
+                <div class="dashboard-tab">Configurações</div>
+            </div>
+            
+            <div class="dashboard-display">
+                <div class="dashboard-ui">
+                    <div class="sidebar">
+                        <div class="menu-item active">Dashboard</div>
+                        <div class="menu-item">Script Executor</div>
+                        <div class="menu-item">Script Hub</div>
+                        <div class="menu-item">Auto Inject</div>
+                        <div class="menu-item">Configurações</div>
+                        <div class="menu-item">Key System</div>
+                        <div class="menu-item">Suporte</div>
+                    </div>
+                    
+                    <div class="content-area">
+                        <div class="script-editor">
+                            <span style="color: #ffaa00;">--[[ AverionX Script Executor ]]--</span><br>
+                            <span style="color: #00ff88;">local</span> <span style="color: #ffffff;">averion</span> = <span style="color: #ffffff;">require</span>(<span style="color: #ffaa00;">"averionx"</span>)<br><br>
+                            <span style="color: #00ff88;">function</span> <span style="color: #ffffff;">executeScript</span>(<span style="color: #ffffff;">script</span>)<br>
+                            &nbsp;&nbsp;<span style="color: #ffffff;">averion</span>.<span style="color: #ffffff;">inject</span>()<br>
+                            &nbsp;&nbsp;<span style="color: #ffffff;">averion</span>.<span style="color: #ffffff;">execute</span>(<span style="color: #ffffff;">script</span>)<br>
+                            <span style="color: #00ff88;">end</span>
+                        </div>
+                        
+                        <div class="controls">
+                            <div class="btn btn-secondary" style="padding: 0.5rem 1rem;">Carregar Script</div>
+                            <div class="btn btn-primary" style="padding: 0.5rem 1rem;">Executar</div>
+                            <div class="btn btn-primary" style="padding: 0.5rem 1rem; background: var(--success);">Injectar</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    
-    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="section">
+        <div class="section-header">
+            <div class="section-badge">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                    <path d="M12 17h.01"/>
+                </svg>
+                FAQ
+            </div>
+            <h2 class="section-title">Perguntas <span style="color: var(--primary);">Frequentes</span></h2>
+            <p class="section-subtitle">
+                Tudo o que você precisa saber sobre o AverionX Executor
+            </p>
+        </div>
+        
+        <div class="faq-container">
+            <div class="faq-item active">
+                <div class="faq-question">
+                    O que é o AverionX?
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    AverionX é um executor avançado com dashboard web integrado, desenvolvido para execução e injeção de scripts no Roblox. Possui interface interativa, menu EXE completo e diversas funcionalidades personalizadas.
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    É seguro usar o AverionX?
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    Sim! O AverionX utiliza criptografia avançada, proteção contra detecção e atualizações constantes para garantir a segurança dos usuários. Não coletamos dados pessoais e todo o processo é feito localmente.
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    Como funciona a injeção automática?
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    O AverionX detecta automaticamente quando o Roblox está aberto e realiza a injeção em menos de 2ms. Você também pode configurar a injeção manual ou por atalho no menu EXE.
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    Preciso pagar para usar?
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    O AverionX oferece uma versão gratuita com todas as funcionalidades essenciais. Existe também uma versão premium com recursos avançados e suporte prioritário.
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    Como obtenho suporte?
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    Oferecemos suporte 24/7 através do nosso servidor no Discord, sistema de tickets e documentação completa. Usuários premium recebem suporte prioritário.
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    Com que frequência são lançadas atualizações?
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    Lançamos atualizações semanais com novas funcionalidades, melhorias de desempenho e correções de segurança. Patches críticos são lançados imediatamente.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section id="download" class="cta-section">
+        <div class="cta-card">
+            <div class="cta-content">
+                <div class="section-badge" style="margin-bottom: 2rem;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>
+                    </svg>
+                    BAIXE AGORA
+                </div>
+                
+                <h2 class="section-title" style="font-size: 3rem; margin-bottom: 1rem;">
+                    Pronto para <span style="color: var(--primary);">Dominar</span>?
+                </h2>
+                
+                <p class="section-subtitle" style="margin-bottom: 3rem;">
+                    Junte-se a milhares de usuários que confiam no AverionX para suas necessidades de execução de scripts no Roblox.
+                </p>
+                
+                <div class="nav-buttons" style="justify-content: center; gap: 1.5rem;">
+                    <a href="#" class="btn btn-primary" style="padding: 1.25rem 3rem; font-size: 1.2rem;">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        Download v2.5
+                    </a>
+                    <a href="#" class="btn btn-secondary" style="padding: 1.25rem 3rem; font-size: 1.2rem;">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                        </svg>
+                        Entrar no Discord
+                    </a>
+                </div>
+                
+                <div style="margin-top: 3rem; display: flex; justify-content: center; gap: 2rem; color: var(--text-muted);">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <div style="width: 8px; height: 8px; background: var(--primary); border-radius: 50%;"></div>
+                        <span>100% Gratuito</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <div style="width: 8px; height: 8px; background: var(--primary); border-radius: 50%; animation: pulse 2s infinite;"></div>
+                        <span>Sem Vírus</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <div style="width: 8px; height: 8px; background: var(--primary); border-radius: 50%;"></div>
+                        <span>Atualizações Constantes</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div>
+                <div class="footer-logo">
+                    <div class="logo-icon" style="width: 32px; height: 32px;"></div>
+                    <span class="logo-text">AVERIONX</span>
+                </div>
+                <p class="footer-text">
+                    Executor avançado com dashboard web integrado para execução de scripts no Roblox. 
+                    Desenvolvido para performance, segurança e usabilidade.
+                </p>
+            </div>
+            
+            <div class="footer-links">
+                <h3>Produto</h3>
+                <ul>
+                    <li><a href="#features">Funcionalidades</a></li>
+                    <li><a href="#dashboard">Dashboard</a></li>
+                    <li><a href="#faq">FAQ</a></li>
+                    <li><a href="#download">Download</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-links">
+                <h3>Recursos</h3>
+                <ul>
+                    <li><a href="#">Documentação</a></li>
+                    <li><a href="#">Script Hub</a></li>
+                    <li><a href="#">API</a></li>
+                    <li><a href="#">Changelog</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-links">
+                <h3>Legal</h3>
+                <ul>
+                    <li><a href="#">Termos de Uso</a></li>
+                    <li><a href="#">Política de Privacidade</a></li>
+                    <li><a href="#">Licença</a></li>
+                    <li><a href="#">DMCA</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>© 2024 AverionX. Todos os direitos reservados. Roblox é uma marca registrada da Roblox Corporation.</p>
+        </div>
+    </footer>
+
     <script>
-        // Configuração das partículas
-        particlesJS("particles-js", {
-            "particles": {
-                "number": {
-                    "value": 100,
-                    "density": {
-                        "enable": true,
-                        "value_area": 800
-                    }
-                },
-                "color": {
-                    "value": "#888888"  // Cinza médio em vez de branco
-                },
-                "shape": {
-                    "type": "circle",
-                    "stroke": {
-                        "width": 0,
-                        "color": "#000000"
-                    }
-                },
-                "opacity": {
-                    "value": 0.7,  // Aumentei a opacidade
-                    "random": true,
-                    "anim": {
-                        "enable": false,
-                        "speed": 1,
-                        "opacity_min": 0.3,  // Mínimo aumentado
-                        "sync": false
-                    }
-                },
-                "size": {
-                    "value": 2.5,  // Tamanho reduzido
-                    "random": true,
-                    "anim": {
-                        "enable": false,
-                        "speed": 40,
-                        "size_min": 0.1,
-                        "sync": false
-                    }
-                },
-                "line_linked": {
-                    "enable": true,
-                    "distance": 120,  // Distância reduzida
-                    "color": "#666666",  // Cinza mais escuro
-                    "opacity": 0.3,  // Opacidade reduzida
-                    "width": 0.8  // Largura reduzida
-                },
-                "move": {
-                    "enable": true,
-                    "speed": 1.5,  // Velocidade reduzida
-                    "direction": "none",
-                    "random": true,
-                    "straight": false,
-                    "out_mode": "out",
-                    "bounce": false
-                }
-            },
-            "interactivity": {
-                "detect_on": "canvas",
-                "events": {
-                    "onhover": {
-                        "enable": true,
-                        "mode": "repulse"  // Mudei para repulsão
-                    },
-                    "onclick": {
-                        "enable": true,
-                        "mode": "push"
-                    },
-                    "resize": true
-                },
-                "modes": {
-                    "repulse": {
-                        "distance": 100,  // Distância de repulsão menor
-                        "duration": 0.4
-                    },
-                    "push": {
-                        "particles_nb": 6  // Mais partículas ao clicar
-                    }
-                }
-            },
-            "retina_detect": true
+        // Criar partículas animadas
+        function createParticles() {
+            const container = document.getElementById('particles');
+            const particleCount = 30;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                
+                // Tamanho aleatório
+                const size = Math.random() * 3 + 1;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                
+                // Posição aleatória
+                particle.style.left = `${Math.random() * 100}vw`;
+                particle.style.top = `${Math.random() * 100}vh`;
+                
+                // Atraso na animação
+                particle.style.animationDelay = `${Math.random() * 20}s`;
+                
+                // Opacidade aleatória
+                particle.style.opacity = Math.random() * 0.3 + 0.1;
+                
+                container.appendChild(particle);
+            }
+        }
+        
+        // FAQ toggle
+        document.querySelectorAll('.faq-question').forEach(question => {
+            question.addEventListener('click', () => {
+                const item = question.parentElement;
+                item.classList.toggle('active');
+            });
         });
         
-        // Funções para as abas "Sobre"
-        function showAboutTab(tabId) {
-            document.querySelectorAll('.about-content').forEach(tab => {
-                tab.classList.remove('active');
+        // Dashboard tabs
+        document.querySelectorAll('.dashboard-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs
+                document.querySelectorAll('.dashboard-tab').forEach(t => {
+                    t.classList.remove('active');
+                });
+                
+                // Add active class to clicked tab
+                tab.classList.add('active');
             });
-            
-            document.querySelectorAll('.about-tab').forEach(tab => {
-                tab.classList.remove('active');
+        });
+        
+        // Menu items hover
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', () => {
+                // Remove active class from all items
+                document.querySelectorAll('.menu-item').forEach(i => {
+                    i.classList.remove('active');
+                });
+                
+                // Add active class to clicked item
+                item.classList.add('active');
             });
-            
-            document.getElementById(tabId).classList.add('active');
-            document.querySelector(`.about-tab[onclick="showAboutTab('${tabId}')"]`).classList.add('active');
+        });
+        
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+        
+        // Inicializar partículas quando a página carregar
+        window.addEventListener('DOMContentLoaded', createParticles);
+        
+        // Efeito de digitação no editor
+        const codeLines = [
+            '--[[ AverionX Script Executor ]]--',
+            'local averion = require("averionx")',
+            '',
+            'function executeScript(script)',
+            '  averion.inject()',
+            '  averion.execute(script)',
+            'end',
+            '',
+            '-- Auto-execute on inject',
+            'averion.onInject(function()',
+            '  executeScript(mainScript)',
+            'end)'
+        ];
+        
+        let currentLine = 0;
+        let currentChar = 0;
+        const editor = document.querySelector('.script-editor');
+        
+        function typeCode() {
+            if (currentLine < codeLines.length) {
+                const line = codeLines[currentLine];
+                
+                if (currentChar < line.length) {
+                    editor.innerHTML += line[currentChar];
+                    currentChar++;
+                    setTimeout(typeCode, 30);
+                } else {
+                    editor.innerHTML += '<br>';
+                    currentLine++;
+                    currentChar = 0;
+                    setTimeout(typeCode, 100);
+                }
+            }
         }
         
-        // Função de download
-    	function downloadFile(filename) {
-            // Cria um link temporário
-            const link = document.createElement('a');
-            link.href = filename;  // Assume que o arquivo está no mesmo diretório
-            link.download = filename;
+        // Iniciar efeito de digitação quando a seção dashboard estiver visível
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    editor.innerHTML = '';
+                    currentLine = 0;
+                    currentChar = 0;
+                    setTimeout(typeCode, 500);
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
         
-        	// Adiciona ao documento
-            document.body.appendChild(link);
-        
-        // Dispara o clique
-            link.click();
-        
-        // Remove o link
-            document.body.removeChild(link);
-        
-        // Opcional: tratamento de erro
-            link.onerror = function() {
-               alert(`Erro: O arquivo ${filename} não foi encontrado no servidor.`);
-               console.error(`Arquivo não encontrado: ${filename}`);
-            };
-         }
-        
-        // Função para mostrar modal de premium
-        function showPremiumModal() {
-            alert("Redirecionando para a página de aquisição do Premium...\n\nNa implementação real, isso abriria um modal ou redirecionaria para uma página de pagamento.");
-        }
+        observer.observe(document.querySelector('#dashboard'));
     </script>
 </body>
 </html>
